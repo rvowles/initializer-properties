@@ -37,8 +37,7 @@ class SystemPropertyInitializer implements BatheInitializer {
 				else
 					System.setProperty(property, Boolean.TRUE.toString());
 			} else if (arg.startsWith(MINUS_P)) {
-				File properties = new File(arg.substring(MINUS_P.length()));
-				System.getProperties().putAll(loadProperties(properties));
+				loadProperties(arg.substring(MINUS_P.length()));
 			} else
 				appArguments.add(arg);
 		}
@@ -46,20 +45,33 @@ class SystemPropertyInitializer implements BatheInitializer {
 		return appArguments.toArray(new String[appArguments.size()])
 	}
 
-	protected Properties loadProperties(File file) {
-		Properties values = new DuplicateProperties()
+	protected void loadProperties(String url) {
+		Properties loadingProperties = new DuplicateProperties();
 
-		if (file.exists()) {
-			try {
-				file.withInputStream { InputStream is ->
-					values.load(is)
+		if (url.startsWith("classpath:")) {
+			InputStream is = getClass().getResourceAsStream(url.substring(10))
+
+			if (!is) {
+				System.err.println("Failed to load ${url}  (${url.substring(10)})")
+			} else {
+				loadingProperties.load(is)
+			}
+
+		} else if (url.contains(':')) {
+			URL source = new URL(url)
+			InputStream is = source.openStream()
+			loadingProperties.load(is)
+			is.close()
+		} else {
+			File properties = new File(url)
+			if (properties.exists()) {
+				properties.withInputStream { InputStream is ->
+					loadingProperties.load(is)
 				}
-			} catch (IOException e) {
-				throw new RuntimeException(String.format("Failed to read properties file '%s'", file), e);
 			}
 		}
 
-		return values;
+		System.getProperties().putAll(loadingProperties);
 	}
 
 	/**
