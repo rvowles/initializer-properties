@@ -45,6 +45,10 @@ class SystemPropertyInitializer implements BatheInitializer {
 		return appArguments.toArray(new String[appArguments.size()])
 	}
 
+	private boolean isWindows() {
+		return File.pathSeparatorChar == ';'
+	}
+
 	protected void loadProperties(String url) {
 		Properties loadingProperties = new DuplicateProperties();
 
@@ -57,7 +61,7 @@ class SystemPropertyInitializer implements BatheInitializer {
 				loadingProperties.load(is)
 			}
 
-		} else if (url.contains(':')) {
+		} else if (url.contains(':') && (!isWindows() || url.indexOf(':') > 1)) { // deal with c: d: garbage
 			URL source = new URL(url)
 			InputStream is = source.openStream()
 			loadingProperties.load(is)
