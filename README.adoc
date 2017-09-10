@@ -1,0 +1,6 @@
+== System Initializer for Bathe
+
+This project allows you to specify a -P<filename> and  those items in that file will be loaded into the system properties
+in a flat heirarchy.
+
+The filename  
