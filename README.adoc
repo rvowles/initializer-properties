@@ -3,4 +3,43 @@
 This project allows you to specify a -P<filename> and  those items in that file will be loaded into the system properties
 in a flat heirarchy.
 
-The filename  
+The filename can be on the classpath (`classpath:/META-INF/blah.properties`), or a file on disk. If it is a file
+on disk, then it will be put into a list and then loaded all in one go. These files are put in a watch-list so if
+you so chose, they can be watched for configuration change and reloaded into the system properties.
+
+Files can be `.properties` or `.yaml` files - SnakeYaml is used and the YAML is flattened before being loaded into the
+properties.
+
+Properties cannot duplicate in the same file, an error will occur on load if so.
+
+Your application when run would look something like this:
+
+----
+java -jar target/app.jar -Pclasspath:/config.yaml -P/etc/java/myconfig.properties
+----
+
+All `-P` (and `-D` when after the app.jar) are removed from the arguments so arguments passed by Bathe to your application
+will not have those properties in it.
+
+NB: No space is allowed between `-P/-D` and the value. 
+
+=== Watching
+
+There are two special flags that can be used when watching. To watch, you need to use:
+
+[source:java]
+----
+new BatheTimeWatcher().startWatching();
+----   
+
+This will check to see if there if there are any files worth watching and periodically check and reload them. 
+
+This is configured via a system property `bathe.property-loader.timeout` - which is the number of seconds between
+checks.
+
+If you wish for your application to exit when a change is detected (for example, in Kubernetes and you cannot do
+anything about the updated properties) then you can set the `bathe.property-loader.dieOnConfigChange` property. If set to
+ a number then it will exit with that exit value, otherwise it exits with 0.
+ 
+ 
+
