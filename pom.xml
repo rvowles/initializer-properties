@@ -8,7 +8,7 @@
   </parent>
   <groupId>com.bluetrainsoftware.bathe.initializers</groupId>
   <artifactId>system-property-loader</artifactId>
-  <version>3.1</version>
+  <version>3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Bathe Initializer for System Property Loading. Adds in watching and system death on config change to support dynamic properties (aka Kubernetes).</name>
   <dependencies>
@@ -110,8 +110,4 @@
 
     </plugins>
   </build>
-
-  <scm>
-    <tag>system-property-loader-3.1</tag>
-  </scm>
 </project>
